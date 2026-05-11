@@ -5,6 +5,7 @@ from datetime import datetime
 import pytz
 import random
 import time
+import io
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="GLOBALINTERNET.PY | Live GourdePulse", layout="wide")
@@ -15,43 +16,43 @@ languages = {
         "core_hub": "CORE HUB",
         "select_pair": "Select Market Pair:",
         "dev_profile": "DEVELOPER PROFILE",
-        "role": "Engineer in Chief at GlobalInternet.py",
+        "role": "Technology Coordinator | Lead Engineer",
         "marquee": "⚡ LIVE FEED: HTG LIQUIDITY ANALYSIS ACTIVE ... 2026 FISCAL DATA SYNCED ... ENGINEERED BY GESNER DESLANDES ...",
         "health": "Currency Health Score",
         "volatility": "Volatility",
         "volume": "Market Volume (24h)",
         "insight": "Professional Market Analytics",
         "signal": "Market Signal",
-        "btn_report": "🚀 GENERATE FISCAL REPORT",
-        "confirm": "CONFIRM DOWNLOAD"
+        "btn_report": "📊 GENERATE FISCAL REPORT",
+        "download": "📥 Download CSV for Audit"
     },
     "Français": {
         "core_hub": "CENTRE CENTRAL",
         "select_pair": "Sélectionner la Paire:",
         "dev_profile": "PROFIL DU DÉVELOPPEUR",
-        "role": "Ingénieur en Chef chez GlobalInternet.py",
+        "role": "Coordinateur Technologique | Ingénieur Principal",
         "marquee": "⚡ FLUX EN DIRECT: ANALYSE DE LIQUIDITÉ HTG ACTIVE ... DONNÉES FISCALES 2026 ... CONÇU PAR GESNER DESLANDES ...",
         "health": "Score de Santé de la Devise",
         "volatility": "Volatilité",
         "volume": "Volume du Marché (24h)",
         "insight": "Analytique Professionnelle du Marché",
         "signal": "Signal du Marché",
-        "btn_report": "🚀 GÉNÉRER LE RAPPORT FISCAL",
-        "confirm": "CONFIRMER LE TÉLÉCHARGEMENT"
+        "btn_report": "📊 GÉNÉRER LE RAPPORT FISCAL",
+        "download": "📥 Télécharger CSV pour Audit"
     },
     "Kreyòl Ayisyen": {
         "core_hub": "HUB PRENSIPAL",
         "select_pair": "Chwazi Pè Lajan:",
         "dev_profile": "PWOFIL DEVLOPÈ A",
-        "role": "Enjenyè an Chèf nan GlobalInternet.py",
+        "role": "Coordinateur Technologique | Enjenyè an Chèf",
         "marquee": "⚡ LIVE FEED: ANALIZ LIKIDITE HTG AKTIF ... DONE FISKAL 2026 ... GESNER DESLANDES TE BWASE PWOJÈ SA ...",
         "health": "Sante Lajan an",
         "volatility": "Volatilite",
         "volume": "Volim Mache a (24h)",
         "insight": "Analiz Pwofesyonèl Mache a",
         "signal": "Siyal Mache",
-        "btn_report": "🚀 JENERE RAPÒ FISKAL",
-        "confirm": "KONFIME TELECHAJMAN"
+        "btn_report": "📊 JENERE RAPÒ FISKAL",
+        "download": "📥 Telechaje CSV pou Odit"
     }
 }
 
@@ -89,29 +90,52 @@ with st.sidebar:
     st.markdown(f"**{t['dev_profile']}**")
     st.success("Gesner Deslandes")
     st.caption(f"🚀 {t['role']}")
+    
+    # FISCAL DOWNLOAD SECTION
+    st.markdown("---")
+    st.subheader(t["btn_report"])
+    
+    # Generate data for the CSV
+    haiti_tz = pytz.timezone('America/Port-au-Prince')
+    current_time_haiti = datetime.now(haiti_tz)
+    
+    report_data = {
+        "Report ID": [f"HTG-SYNC-{random.randint(1000, 9999)}"],
+        "Date": [current_time_haiti.strftime('%Y-%m-%d')],
+        "Time (Haiti)": [current_time_haiti.strftime('%H:%M:%S %p')],
+        "Currency Pair": [f"{selected_currency}/HTG"],
+        "Live Market Rate": [131.19 + random.uniform(-0.03, 0.03)],
+        "Market Status": ["High Liquidity"],
+        "Engineer": ["Gesner Deslandes"]
+    }
+    df_report = pd.DataFrame(report_data)
+    csv = df_report.to_csv(index=False).encode('utf-8')
+    
+    st.download_button(
+        label=t["download"],
+        data=csv,
+        file_name=f"GLOBALINTERNET_REPORT_{current_time_haiti.strftime('%H%M%S')}.csv",
+        mime="text/csv",
+    )
 
 # --- MAIN PAGE PLACEHOLDERS ---
 st.markdown('<p class="title-glow">GLOBALINTERNET.PY</p>', unsafe_allow_html=True)
 st.markdown(f'<div class="marquee">{t["marquee"]}</div>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Metric Placeholders
 m_col1, m_col2, m_col3 = st.columns(3)
 met1 = m_col1.empty()
 met2 = m_col2.empty()
 met3 = m_col3.empty()
 
-# Chart Placeholder
 st.markdown(f"<h2 style='color:white; text-align:center;'>{t['insight']}</h2>", unsafe_allow_html=True)
 chart_placeholder = st.empty()
 
 # --- HAITI TIME & MARKET REFRESH LOOP ---
-haiti_tz = pytz.timezone('America/Port-au-Prince')
 base_htg = 131.19
 multipliers = {"USD": 1.0, "EUR": 1.08, "DOP": 0.017, "CAD": 0.74}
 
 while True:
-    # 1. Update Time
     haiti_now = datetime.now(haiti_tz)
     time_string = haiti_now.strftime('%H:%M:%S %p')
     date_string = haiti_now.strftime('%d/%m/%Y')
@@ -123,16 +147,13 @@ while True:
         </div>
     """, unsafe_allow_html=True)
 
-    # 2. Update Market Data (Live Flutter)
     live_flutter = random.uniform(-0.03, 0.03)
     final_rate = (base_htg * multipliers[selected_currency]) + live_flutter
     
-    # Update Metrics in real-time
     met1.metric(label=f"{selected_currency} to HTG", value=f"{final_rate:.2f}", delta=f"{live_flutter:.4f}")
     met2.metric(label=t["health"], value=f"{random.randint(82, 84)}/100", delta=f"{random.uniform(-1.5, -2.5):.1f}% {t['volatility']}")
     met3.metric(label=t["volume"], value=f"{random.uniform(1.2, 1.3):.1f}M", delta="LIVE FEED")
 
-    # 3. Update Chart in real-time
     df = pd.DataFrame({
         'Time': pd.date_range(end=haiti_now, periods=30, freq='h'),
         'Value': [final_rate + (random.uniform(-1, 1)) for _ in range(30)]
@@ -144,11 +165,10 @@ while True:
     
     chart_placeholder.plotly_chart(fig, use_container_width=True)
 
-    # Footer stays static at bottom
     st.markdown(f"""
         <div class="footer">
             © 2026 GLOBALINTERNET.PY | Software Engineered by Gesner Deslandes
         </div>
         """, unsafe_allow_html=True)
 
-    time.sleep(1) # Re-run the entire dashboard logic every 1 second
+    time.sleep(1)
