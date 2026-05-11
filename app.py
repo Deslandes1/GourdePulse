@@ -7,7 +7,7 @@ import random
 import time
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="GLOBALINTERNET.PY | GourdePulse", layout="wide")
+st.set_page_config(page_title="GLOBALINTERNET.PY | Live GourdePulse", layout="wide")
 
 # --- TRANSLATION DICTIONARY ---
 languages = {
@@ -80,7 +80,6 @@ with st.sidebar:
     t = languages[lang_choice]
     st.markdown(f'<p class="sidebar-header">{t["core_hub"]}</p>', unsafe_allow_html=True)
     
-    # Placeholder for the Haiti Clock
     clock_placeholder = st.empty()
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -91,50 +90,29 @@ with st.sidebar:
     st.success("Gesner Deslandes")
     st.caption(f"🚀 {t['role']}")
 
-# --- HAITI TIME LOGIC ---
-haiti_tz = pytz.timezone('America/Port-au-Prince')
-
-# --- DYNAMIC MARKET LOGIC ---
-base_htg = 131.19
-multipliers = {"USD": 1.0, "EUR": 1.08, "DOP": 0.017, "CAD": 0.74}
-live_flutter = random.uniform(-0.02, 0.02)
-final_rate = (base_htg * multipliers[selected_currency]) + live_flutter
-
-# --- MAIN INTERFACE ---
+# --- MAIN PAGE PLACEHOLDERS ---
 st.markdown('<p class="title-glow">GLOBALINTERNET.PY</p>', unsafe_allow_html=True)
 st.markdown(f'<div class="marquee">{t["marquee"]}</div>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric(label=f"{selected_currency} to HTG", value=f"{final_rate:.2f}", delta=f"{live_flutter:.4f}")
-with col2:
-    st.metric(label=t["health"], value=f"{random.randint(82, 84)}/100", delta=f"{random.uniform(-1.5, -2.5):.1f}% {t['volatility']}")
-with col3:
-    st.metric(label=t["volume"], value=f"{random.uniform(1.2, 1.3):.1f}M", delta="LIVE")
+# Metric Placeholders
+m_col1, m_col2, m_col3 = st.columns(3)
+met1 = m_col1.empty()
+met2 = m_col2.empty()
+met3 = m_col3.empty()
 
-# --- CHART ---
-df = pd.DataFrame({
-    'Time': pd.date_range(start=datetime.now(haiti_tz), periods=30, freq='h'),
-    'Value': [final_rate + (random.uniform(-1, 1)) for _ in range(30)]
-})
-fig = go.Figure()
-fig.add_trace(go.Scatter(x=df['Time'], y=df['Value'], mode='lines', line=dict(color='#a259ff', width=5), fill='tozeroy', fillcolor='rgba(162, 89, 255, 0.1)'))
-fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color="white"), height=350, margin=dict(l=0, r=0, t=0, b=0))
-st.plotly_chart(fig, use_container_width=True)
+# Chart Placeholder
+st.markdown(f"<h2 style='color:white; text-align:center;'>{t['insight']}</h2>", unsafe_allow_html=True)
+chart_placeholder = st.empty()
 
-# --- FOOTER ---
-st.markdown(f"""
-    <div class="footer">
-        © 2026 GLOBALINTERNET.PY | Software Engineered by Gesner Deslandes
-    </div>
-    """, unsafe_allow_html=True)
+# --- HAITI TIME & MARKET REFRESH LOOP ---
+haiti_tz = pytz.timezone('America/Port-au-Prince')
+base_htg = 131.19
+multipliers = {"USD": 1.0, "EUR": 1.08, "DOP": 0.017, "CAD": 0.74}
 
-# --- CONTINUOUS LIVE CLOCK LOOP (Haiti Time) ---
 while True:
-    # Always fetch the current time in Haiti Zone
+    # 1. Update Time
     haiti_now = datetime.now(haiti_tz)
-    
     time_string = haiti_now.strftime('%H:%M:%S %p')
     date_string = haiti_now.strftime('%d/%m/%Y')
     
@@ -144,4 +122,33 @@ while True:
             TIME: {time_string}
         </div>
     """, unsafe_allow_html=True)
-    time.sleep(1)
+
+    # 2. Update Market Data (Live Flutter)
+    live_flutter = random.uniform(-0.03, 0.03)
+    final_rate = (base_htg * multipliers[selected_currency]) + live_flutter
+    
+    # Update Metrics in real-time
+    met1.metric(label=f"{selected_currency} to HTG", value=f"{final_rate:.2f}", delta=f"{live_flutter:.4f}")
+    met2.metric(label=t["health"], value=f"{random.randint(82, 84)}/100", delta=f"{random.uniform(-1.5, -2.5):.1f}% {t['volatility']}")
+    met3.metric(label=t["volume"], value=f"{random.uniform(1.2, 1.3):.1f}M", delta="LIVE FEED")
+
+    # 3. Update Chart in real-time
+    df = pd.DataFrame({
+        'Time': pd.date_range(end=haiti_now, periods=30, freq='h'),
+        'Value': [final_rate + (random.uniform(-1, 1)) for _ in range(30)]
+    })
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df['Time'], y=df['Value'], mode='lines', line=dict(color='#a259ff', width=5), fill='tozeroy', fillcolor='rgba(162, 89, 255, 0.1)'))
+    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color="white"), height=350, margin=dict(l=0, r=0, t=0, b=0), xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor='rgba(162, 89, 255, 0.1)'))
+    
+    chart_placeholder.plotly_chart(fig, use_container_width=True)
+
+    # Footer stays static at bottom
+    st.markdown(f"""
+        <div class="footer">
+            © 2026 GLOBALINTERNET.PY | Software Engineered by Gesner Deslandes
+        </div>
+        """, unsafe_allow_html=True)
+
+    time.sleep(1) # Re-run the entire dashboard logic every 1 second
