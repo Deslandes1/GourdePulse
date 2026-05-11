@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime
+import pytz
 import random
 import time
 
@@ -63,15 +64,9 @@ st.markdown("""
     [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-weight: 800 !important; }
     .title-glow { font-size: 55px; font-weight: 900; color: #FFFFFF; text-shadow: 0 0 20px rgba(162, 89, 255, 0.8); text-align: center; }
     .digital-clock { 
-        background: #000; 
-        color: #00ff00; 
-        font-family: 'Courier New', monospace; 
-        padding: 15px; 
-        border-radius: 5px; 
-        text-align: left; 
-        border: 1px solid #a259ff; 
-        font-size: 18px; 
-        font-weight: bold; 
+        background: #000; color: #00ff00; font-family: 'Courier New', monospace; 
+        padding: 15px; border-radius: 5px; text-align: left; 
+        border: 1px solid #a259ff; font-size: 18px; font-weight: bold; 
         box-shadow: 0 0 15px rgba(162, 89, 255, 0.3);
     }
     .marquee { font-family: 'Courier New', monospace; color: #00ff00; background: #000; padding: 10px; border-top: 1px solid #a259ff; font-weight: bold; }
@@ -83,10 +78,9 @@ st.markdown("""
 with st.sidebar:
     lang_choice = st.selectbox("🌐 Language Selection", ["English", "Français", "Kreyòl Ayisyen"])
     t = languages[lang_choice]
-    
     st.markdown(f'<p class="sidebar-header">{t["core_hub"]}</p>', unsafe_allow_html=True)
     
-    # Placeholder for the running clock
+    # Placeholder for the Haiti Clock
     clock_placeholder = st.empty()
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -96,6 +90,9 @@ with st.sidebar:
     st.markdown(f"**{t['dev_profile']}**")
     st.success("Gesner Deslandes")
     st.caption(f"🚀 {t['role']}")
+
+# --- HAITI TIME LOGIC ---
+haiti_tz = pytz.timezone('America/Port-au-Prince')
 
 # --- DYNAMIC MARKET LOGIC ---
 base_htg = 131.19
@@ -118,7 +115,7 @@ with col3:
 
 # --- CHART ---
 df = pd.DataFrame({
-    'Time': pd.date_range(start=datetime.now(), periods=30, freq='h'),
+    'Time': pd.date_range(start=datetime.now(haiti_tz), periods=30, freq='h'),
     'Value': [final_rate + (random.uniform(-1, 1)) for _ in range(30)]
 })
 fig = go.Figure()
@@ -133,13 +130,13 @@ st.markdown(f"""
     </div>
     """, unsafe_allow_html=True)
 
-# --- CONTINUOUS LIVE CLOCK LOOP ---
+# --- CONTINUOUS LIVE CLOCK LOOP (Haiti Time) ---
 while True:
-    now = datetime.now()
-    # Format: DATE: 11/05/2026 | TIME: 15:04:25 PM
-    # %p provides the AM/PM indicator
-    time_string = now.strftime('%H:%M:%S %p')
-    date_string = now.strftime('%d/%m/%Y')
+    # Always fetch the current time in Haiti Zone
+    haiti_now = datetime.now(haiti_tz)
+    
+    time_string = haiti_now.strftime('%H:%M:%S %p')
+    date_string = haiti_now.strftime('%d/%m/%Y')
     
     clock_placeholder.markdown(f"""
         <div class="digital-clock">
