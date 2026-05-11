@@ -53,10 +53,13 @@ languages = {
     }
 }
 
-# --- CUSTOM CSS FOR "ATTRACTIVELY BEAUTIFUL" UI ---
+# --- CUSTOM CSS: PURPLE THEME & STRONG WHITE TEXT ---
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; }
+    /* Gradient Purple Background */
+    .stApp {
+        background: linear-gradient(135deg, #1a0b2e 0%, #0e1117 100%);
+    }
     
     /* CORE HUB - High Visibility Gold */
     .sidebar-header {
@@ -67,15 +70,17 @@ st.markdown("""
         margin-bottom: 5px;
     }
 
-    /* Strong White Metrics */
+    /* STRONG WHITE METRICS */
     [data-testid="stMetricValue"] {
         color: #FFFFFF !important;
         font-size: 42px !important;
         font-weight: 900 !important;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
     }
     [data-testid="stMetricLabel"] {
         color: #FFFFFF !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
+        text-transform: uppercase;
     }
 
     /* Glassmorphism Insight Card */
@@ -83,17 +88,19 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
         padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(162, 89, 255, 0.3);
         backdrop-filter: blur(10px);
     }
 
+    /* GLOBALINTERNET.PY Header - Strong White with Glow */
     .title-glow {
         font-size: 55px;
         font-weight: 900;
-        color: #ffffff;
-        text-shadow: 0 0 20px #00d4ff;
+        color: #FFFFFF;
+        text-shadow: 0 0 20px rgba(162, 89, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4);
         text-align: center;
         margin-bottom: 0px;
+        letter-spacing: 2px;
     }
 
     .marquee {
@@ -101,19 +108,20 @@ st.markdown("""
         color: #00ff00;
         background: #000;
         padding: 10px;
-        border-top: 1px solid #30363d;
+        border-top: 1px solid #a259ff;
         font-weight: bold;
     }
 
     .footer {
         position: fixed;
         left: 0; bottom: 0; width: 100%;
-        background-color: #0e1117;
+        background-color: #1a0b2e;
         color: #FFFFFF !important;
         text-align: center;
         padding: 12px;
-        font-weight: 800;
-        border-top: 2px solid #30363d;
+        font-weight: 900;
+        border-top: 2px solid #a259ff;
+        z-index: 100;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -147,7 +155,7 @@ with col2:
 with col3:
     st.metric(label=t["volume"], value="1.2M", delta="High Activity")
 
-# --- ENHANCED INSIGHT BOARD (THE RE-DESIGN) ---
+# --- ENHANCED INSIGHT BOARD ---
 st.markdown(f"<h2 style='color:white; text-align:center;'>{t['insight']}</h2>", unsafe_allow_html=True)
 
 chart_col, signal_col = st.columns([3, 1])
@@ -163,9 +171,9 @@ with chart_col:
     fig.add_trace(go.Scatter(
         x=df['Time'], y=df['Value'],
         mode='lines',
-        line=dict(color='#00d4ff', width=5),
+        line=dict(color='#a259ff', width=5), # Chart line updated to Purple
         fill='tozeroy',
-        fillcolor='rgba(0, 212, 255, 0.15)'
+        fillcolor='rgba(162, 89, 255, 0.1)'
     ))
     fig.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',
@@ -173,7 +181,7 @@ with chart_col:
         font=dict(color="white"),
         margin=dict(l=0, r=0, t=10, b=0),
         xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=True, gridcolor='#2e313d')
+        yaxis=dict(showgrid=True, gridcolor='rgba(162, 89, 255, 0.1)')
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -182,10 +190,10 @@ with signal_col:
     <div class="insight-card">
         <h4 style="color:white; margin-bottom:10px;">{t['signal']}</h4>
         <p style="color:#00ff00; font-size:24px; font-weight:bold;">STRONG BUY</p>
-        <hr style="border-color:rgba(255,255,255,0.1);">
+        <hr style="border-color:rgba(162, 89, 255, 0.3);">
         <p style="color:white; font-size:14px;">Resistance: 133.50</p>
         <p style="color:white; font-size:14px;">Support: 129.10</p>
-        <p style="color:#00d4ff; font-size:12px; margin-top:20px;">Powered by GlobalInternet Logic</p>
+        <p style="color:#a259ff; font-size:12px; margin-top:20px; font-weight:bold;">Powered by GlobalInternet Logic</p>
     </div>
     """, unsafe_allow_html=True)
 
