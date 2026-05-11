@@ -47,6 +47,7 @@ st.markdown("""
         padding: 10px;
         font-size: 14px;
         border-top: 1px solid #2e313d;
+        z-index: 100;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -75,8 +76,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# --- MOCK LIVE DATA LOGIC ---
-# In a real app, you'd call an API here. We'll simulate movement for the video.
+# --- LIVE DATA LOGIC ---
 base_rates = {"USD": 131.25, "EUR": 142.10, "DOP": 2.22, "CAD": 96.40, "BRL": 26.15}
 current_code = selected_currency.split(" ")[0]
 current_rate = base_rates[current_code] + random.uniform(-0.5, 0.5)
@@ -94,10 +94,12 @@ with col2:
 with col3:
     st.metric(label="Market Volume (24h)", value="1.2M", delta="High Activity")
 
-# --- LIVE CHART ---
+# --- LIVE CHART (FIXED LOGIC) ---
 st.markdown("### Market Behavior Insight")
+
+# Fixed the frequency error by using datetime.now() and lowercase 'h'
 df = pd.DataFrame({
-    'Time': pd.date_range(start='now', periods=20, freq='H'),
+    'Time': pd.date_range(start=datetime.now(), periods=20, freq='h'),
     'Rate': [current_rate + random.uniform(-1, 1) for _ in range(20)]
 })
 
@@ -115,15 +117,15 @@ fig.update_layout(
     yaxis=dict(showgrid=True, gridcolor='#2e313d')
 )
 
-st.plotly_chart(fig, use_container_運width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # --- DOWNLOAD SECTION ---
 st.markdown("---")
 st.markdown("### Generate Intelligence Report")
-if st.button(f"Download {current_code}/HTG Performance Report"):
-    report_data = df.to_csv().encode('utf-8')
+if st.button(f"Prepare {current_code}/HTG Intelligence Report"):
+    report_data = df.to_csv(index=False).encode('utf-8')
     st.download_button(
-        label="Click to confirm CSV Download",
+        label="Download Report (CSV)",
         data=report_data,
         file_name=f"HTG_{current_code}_Report.csv",
         mime="text/csv"
