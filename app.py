@@ -59,25 +59,37 @@ st.markdown("""
     <style>
     .stApp { background: linear-gradient(135deg, #1a0b2e 0%, #0e1117 100%); }
     .sidebar-header { color: #FFD700 !important; font-size: 28px !important; font-weight: 900 !important; }
-    [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 42px !important; font-weight: 900 !important; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+    [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 42px !important; font-weight: 900 !important; }
     [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-weight: 800 !important; }
     .title-glow { font-size: 55px; font-weight: 900; color: #FFFFFF; text-shadow: 0 0 20px rgba(162, 89, 255, 0.8); text-align: center; }
-    .digital-clock { background: #000; color: #00ff00; font-family: 'Courier New', monospace; padding: 15px; border-radius: 5px; text-align: center; border: 1px solid #a259ff; font-size: 22px; font-weight: bold; box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
+    .digital-clock { 
+        background: #000; 
+        color: #00ff00; 
+        font-family: 'Courier New', monospace; 
+        padding: 15px; 
+        border-radius: 5px; 
+        text-align: left; 
+        border: 1px solid #a259ff; 
+        font-size: 18px; 
+        font-weight: bold; 
+        box-shadow: 0 0 15px rgba(162, 89, 255, 0.3);
+    }
     .marquee { font-family: 'Courier New', monospace; color: #00ff00; background: #000; padding: 10px; border-top: 1px solid #a259ff; font-weight: bold; }
     .footer { position: fixed; left: 0; bottom: 0; width: 100%; background-color: #1a0b2e; color: #FFFFFF !important; text-align: center; padding: 12px; font-weight: 900; border-top: 2px solid #a259ff; z-index: 100; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR & LIVE CLOCK ---
+# --- SIDEBAR ---
 with st.sidebar:
-    lang_choice = st.selectbox("🌐 Language", ["English", "Français", "Kreyòl Ayisyen"])
+    lang_choice = st.selectbox("🌐 Language Selection", ["English", "Français", "Kreyòl Ayisyen"])
     t = languages[lang_choice]
     
     st.markdown(f'<p class="sidebar-header">{t["core_hub"]}</p>', unsafe_allow_html=True)
     
-    # This placeholder allows the clock to update every second
+    # Placeholder for the running clock
     clock_placeholder = st.empty()
     
+    st.markdown("<br>", unsafe_allow_html=True)
     selected_currency = st.selectbox(t["select_pair"], ["USD", "EUR", "DOP", "CAD"])
     
     st.markdown("---")
@@ -121,15 +133,18 @@ st.markdown(f"""
     </div>
     """, unsafe_allow_html=True)
 
-# --- LIVE SECOND-BY-SECOND UPDATE LOOP ---
-# This loop keeps the app alive and running the seconds like a laptop clock
+# --- CONTINUOUS LIVE CLOCK LOOP ---
 while True:
     now = datetime.now()
-    # Update the sidebar clock
+    # Format: DATE: 11/05/2026 | TIME: 15:04:25 PM
+    # %p provides the AM/PM indicator
+    time_string = now.strftime('%H:%M:%S %p')
+    date_string = now.strftime('%d/%m/%Y')
+    
     clock_placeholder.markdown(f"""
         <div class="digital-clock">
-            DATE: {now.strftime('%d/%m/%Y')}<br>
-            TIME: {now.strftime('%H:%M:%S')}
+            DATE: {date_string}<br>
+            TIME: {time_string}
         </div>
     """, unsafe_allow_html=True)
-    time.sleep(1) # Wait 1 second before updating again
+    time.sleep(1)
