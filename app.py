@@ -6,7 +6,7 @@ import random
 import time
 
 # --- PAGE CONFIG ---
-st.set_config = st.set_page_config(page_title="GLOBALINTERNET.PY | GourdePulse", layout="wide")
+st.set_page_config(page_title="GLOBALINTERNET.PY | GourdePulse", layout="wide")
 
 # --- TRANSLATION DICTIONARY ---
 languages = {
@@ -22,8 +22,7 @@ languages = {
         "insight": "Professional Market Analytics",
         "signal": "Market Signal",
         "btn_report": "🚀 GENERATE FISCAL REPORT",
-        "confirm": "CONFIRM DOWNLOAD",
-        "live_status": "LIVE MARKET TIME"
+        "confirm": "CONFIRM DOWNLOAD"
     },
     "Français": {
         "core_hub": "CENTRE CENTRAL",
@@ -37,8 +36,7 @@ languages = {
         "insight": "Analytique Professionnelle du Marché",
         "signal": "Signal du Marché",
         "btn_report": "🚀 GÉNÉRER LE RAPPORT FISCAL",
-        "confirm": "CONFIRMER LE TÉLÉCHARGEMENT",
-        "live_status": "HEURE DU MARCHÉ EN DIRECT"
+        "confirm": "CONFIRMER LE TÉLÉCHARGEMENT"
     },
     "Kreyòl Ayisyen": {
         "core_hub": "HUB PRENSIPAL",
@@ -52,8 +50,7 @@ languages = {
         "insight": "Analiz Pwofesyonèl Mache a",
         "signal": "Siyal Mache",
         "btn_report": "🚀 JENERE RAPÒ FISKAL",
-        "confirm": "KONFIME TELECHAJMAN",
-        "live_status": "TAN MACHE A AN DIRÈK"
+        "confirm": "KONFIME TELECHAJMAN"
     }
 }
 
@@ -64,45 +61,34 @@ st.markdown("""
     .sidebar-header { color: #FFD700 !important; font-size: 28px !important; font-weight: 900 !important; }
     [data-testid="stMetricValue"] { color: #FFFFFF !important; font-size: 42px !important; font-weight: 900 !important; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
     [data-testid="stMetricLabel"] { color: #FFFFFF !important; font-weight: 800 !important; }
-    .title-glow { font-size: 55px; font-weight: 900; color: #FFFFFF; text-shadow: 0 0 20px rgba(162, 89, 255, 0.8); text-align: center; margin-bottom: 0px; }
-    .digital-clock { background: #000; color: #00ff00; font-family: 'Courier New', monospace; padding: 10px; border-radius: 5px; text-align: center; border: 1px solid #a259ff; font-size: 20px; font-weight: bold; }
+    .title-glow { font-size: 55px; font-weight: 900; color: #FFFFFF; text-shadow: 0 0 20px rgba(162, 89, 255, 0.8); text-align: center; }
+    .digital-clock { background: #000; color: #00ff00; font-family: 'Courier New', monospace; padding: 15px; border-radius: 5px; text-align: center; border: 1px solid #a259ff; font-size: 22px; font-weight: bold; box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
     .marquee { font-family: 'Courier New', monospace; color: #00ff00; background: #000; padding: 10px; border-top: 1px solid #a259ff; font-weight: bold; }
     .footer { position: fixed; left: 0; bottom: 0; width: 100%; background-color: #1a0b2e; color: #FFFFFF !important; text-align: center; padding: 12px; font-weight: 900; border-top: 2px solid #a259ff; z-index: 100; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR ---
+# --- SIDEBAR & LIVE CLOCK ---
 with st.sidebar:
-    lang_choice = st.selectbox("🌐 Choose Language", ["English", "Français", "Kreyòl Ayisyen"])
+    lang_choice = st.selectbox("🌐 Language", ["English", "Français", "Kreyòl Ayisyen"])
     t = languages[lang_choice]
     
     st.markdown(f'<p class="sidebar-header">{t["core_hub"]}</p>', unsafe_allow_html=True)
     
-    # DIGITAL CLOCK PROOF OF LIVE
-    now = datetime.now()
-    st.markdown(f"""
-        <div class="digital-clock">
-            DATE: {now.strftime('%d/%m/%Y')}<br>
-            TIME: {now.strftime('%H:%M:%S')}
-        </div>
-    """, unsafe_allow_html=True)
+    # This placeholder allows the clock to update every second
+    clock_placeholder = st.empty()
     
-    st.markdown("<br>", unsafe_allow_html=True)
     selected_currency = st.selectbox(t["select_pair"], ["USD", "EUR", "DOP", "CAD"])
     
     st.markdown("---")
     st.markdown(f"**{t['dev_profile']}**")
     st.success("Gesner Deslandes")
     st.caption(f"🚀 {t['role']}")
-    if st.button("🔄 Force Market Refresh"):
-        st.rerun()
 
 # --- DYNAMIC MARKET LOGIC ---
-# Real-time base rates (approximate for 2026)
 base_htg = 131.19
 multipliers = {"USD": 1.0, "EUR": 1.08, "DOP": 0.017, "CAD": 0.74}
-# Add random "flutter" to prove live updates
-live_flutter = random.uniform(-0.05, 0.05)
+live_flutter = random.uniform(-0.02, 0.02)
 final_rate = (base_htg * multipliers[selected_currency]) + live_flutter
 
 # --- MAIN INTERFACE ---
@@ -110,40 +96,23 @@ st.markdown('<p class="title-glow">GLOBALINTERNET.PY</p>', unsafe_allow_html=Tru
 st.markdown(f'<div class="marquee">{t["marquee"]}</div>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- TOP METRICS ---
 col1, col2, col3 = st.columns(3)
 with col1:
     st.metric(label=f"{selected_currency} to HTG", value=f"{final_rate:.2f}", delta=f"{live_flutter:.4f}")
 with col2:
-    st.metric(label=t["health"], value=f"{random.randint(80, 85)}/100", delta=f"{random.uniform(-1, -3):.1f}% {t['volatility']}")
+    st.metric(label=t["health"], value=f"{random.randint(82, 84)}/100", delta=f"{random.uniform(-1.5, -2.5):.1f}% {t['volatility']}")
 with col3:
-    st.metric(label=t["volume"], value=f"{random.uniform(1.1, 1.4):.1f}M", delta="LIVE")
+    st.metric(label=t["volume"], value=f"{random.uniform(1.2, 1.3):.1f}M", delta="LIVE")
 
-# --- INSIGHT BOARD ---
-st.markdown(f"<h2 style='color:white; text-align:center;'>{t['insight']}</h2>", unsafe_allow_html=True)
-chart_col, signal_col = st.columns([3, 1])
-
+# --- CHART ---
 df = pd.DataFrame({
     'Time': pd.date_range(start=datetime.now(), periods=30, freq='h'),
-    'Value': [final_rate + (random.uniform(-1.5, 1.5)) for _ in range(30)]
+    'Value': [final_rate + (random.uniform(-1, 1)) for _ in range(30)]
 })
-
-with chart_col:
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df['Time'], y=df['Value'], mode='lines', line=dict(color='#a259ff', width=5), fill='tozeroy', fillcolor='rgba(162, 89, 255, 0.1)'))
-    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color="white"), margin=dict(l=0, r=0, t=10, b=0), xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor='rgba(162, 89, 255, 0.1)'))
-    st.plotly_chart(fig, use_container_width=True)
-
-with signal_col:
-    st.markdown(f"""
-    <div style="background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; border: 1px solid #a259ff; backdrop-filter: blur(10px);">
-        <h4 style="color:white; margin-bottom:10px;">{t['signal']}</h4>
-        <p style="color:#00ff00; font-size:24px; font-weight:bold;">MARKET ACTIVE</p>
-        <hr style="border-color:rgba(162, 89, 255, 0.3);">
-        <p style="color:white; font-size:14px;">Last Update: {now.strftime('%H:%M:%S')}</p>
-        <p style="color:#a259ff; font-size:12px; margin-top:20px; font-weight:bold;">Powered by GlobalInternet Logic</p>
-    </div>
-    """, unsafe_allow_html=True)
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=df['Time'], y=df['Value'], mode='lines', line=dict(color='#a259ff', width=5), fill='tozeroy', fillcolor='rgba(162, 89, 255, 0.1)'))
+fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font=dict(color="white"), height=350, margin=dict(l=0, r=0, t=0, b=0))
+st.plotly_chart(fig, use_container_width=True)
 
 # --- FOOTER ---
 st.markdown(f"""
@@ -151,3 +120,16 @@ st.markdown(f"""
         © 2026 GLOBALINTERNET.PY | Software Engineered by Gesner Deslandes
     </div>
     """, unsafe_allow_html=True)
+
+# --- LIVE SECOND-BY-SECOND UPDATE LOOP ---
+# This loop keeps the app alive and running the seconds like a laptop clock
+while True:
+    now = datetime.now()
+    # Update the sidebar clock
+    clock_placeholder.markdown(f"""
+        <div class="digital-clock">
+            DATE: {now.strftime('%d/%m/%Y')}<br>
+            TIME: {now.strftime('%H:%M:%S')}
+        </div>
+    """, unsafe_allow_html=True)
+    time.sleep(1) # Wait 1 second before updating again
